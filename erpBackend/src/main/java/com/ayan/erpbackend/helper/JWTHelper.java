@@ -37,7 +37,7 @@ public class JWTHelper {
     }
 
     // Check if token is expired
-    private Boolean isTokenExpired(String token) {
+    public Boolean isTokenExpired(String token) {
 
         return extractExpiration(token).before(new Date());
     }
