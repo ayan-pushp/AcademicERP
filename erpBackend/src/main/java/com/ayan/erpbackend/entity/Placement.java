@@ -20,8 +20,9 @@ public class Placement {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "organisation", nullable = false)
-    private String organisation;
+    @ManyToOne
+    @JoinColumn(name = "organisation_id", nullable = false)
+    private Organisation organisation;
 
     @Column(name = "profile", nullable = false)
     private String profile;
@@ -35,10 +36,6 @@ public class Placement {
     @Column(name = "minimumGrade", nullable = false)
     private double minimumGrade;
 
-    @OneToMany(mappedBy = "placement")
-    private List<PlacementStudent> placementStudents;
-
-    @OneToMany(mappedBy = "placement")
-    private List<PlacementFilter> placementFilters;
-
+//    @OneToMany(mappedBy = "placement")
+//    private List<PlacementFilter> placementFilters;
 }

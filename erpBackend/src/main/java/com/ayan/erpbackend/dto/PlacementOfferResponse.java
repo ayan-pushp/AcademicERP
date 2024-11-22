@@ -16,7 +16,7 @@ public record PlacementOfferResponse(
         double minimumGrade,
 
         @JsonProperty("intake")
-        double intake,
+        int intake,
 
         @JsonProperty("specialisation")
         String specialisation,

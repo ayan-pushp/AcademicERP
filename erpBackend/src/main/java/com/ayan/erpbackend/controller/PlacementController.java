@@ -1,14 +1,12 @@
 package com.ayan.erpbackend.controller;
 
 import com.ayan.erpbackend.dto.PlacementOfferResponse;
-import com.ayan.erpbackend.entity.Placement;
+import com.ayan.erpbackend.dto.StudentResponse;
 import com.ayan.erpbackend.helper.JWTHelper;
 import com.ayan.erpbackend.service.PlacementService;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 @RestController
@@ -20,14 +18,23 @@ public class PlacementController {
     private final JWTHelper jwtHelper;
 
     @GetMapping("/allOffers")
-    public ResponseEntity<List<PlacementOfferResponse>> getAllPlacements(@RequestHeader("Authorization") String authorizationHeader) {
+    public ResponseEntity<List<Object[]>> getOrganisationOffersWithStudents(
+            @RequestParam(name = "domain", required = false) Long domain,
+            @RequestParam(name = "specialisation", required = false) Long specialisation,
+            @RequestParam(name = "minGrade", required = false) Float minGrade) {
 
-        String token = authorizationHeader.startsWith("Bearer ") ? authorizationHeader.substring(7) : authorizationHeader;
-        if (jwtHelper.isTokenExpired(token)) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token is expired");
-        }
+        return ResponseEntity.ok(placementService.getOrganisationOffersWithFilteredStudents(domain, specialisation, minGrade));
+    }
 
-        List<PlacementOfferResponse> placements = placementService.getAllPlacements();
-        return ResponseEntity.ok(placements);
+    @GetMapping("/eligibleFor/{placementId}")
+    public ResponseEntity<List<StudentResponse>> getEligibleStudents(@PathVariable Long placementId) {
+        List<StudentResponse> eligibleStudents = placementService.getEligibleStudents(placementId);
+        return ResponseEntity.ok(eligibleStudents);
+    }
+
+    @GetMapping("/appliedTo/{placementId}")
+    public ResponseEntity<List<StudentResponse>> getAppliedStudents(@PathVariable Long placementId) {
+        List<StudentResponse> eligibleStudents = placementService.getAppliedStudents(placementId);
+        return ResponseEntity.ok(eligibleStudents);
     }
 }

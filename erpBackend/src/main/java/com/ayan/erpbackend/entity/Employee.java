@@ -30,8 +30,9 @@ public class Employee {
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "department", nullable = false)
-    private String department;
+    @ManyToOne
+    @JoinColumn(name = "department_id", referencedColumnName = "department_id", nullable = false)
+    private Department department;
 
     @Column(name = "password")
     private String password;

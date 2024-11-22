@@ -39,13 +39,17 @@ public class Student {
     @Column(name = "graduation_year",nullable = false)
     private int graduationYear;
 
-    @Column(name="domain",nullable = false)
-    private String domain;
+    @ManyToOne
+    @JoinColumn(name = "domain", referencedColumnName = "domain_id", nullable = false)
+    private Domain domain;
 
-    @Column(name = "specialisation",nullable = false)
-    private String specialisation;
+    @ManyToOne
+    @JoinColumn(name = "specialisation", referencedColumnName = "specialisation_id", nullable = false)
+    private Specialisation specialisation;
 
-    @Column(name = "placement_id")
-    private String placementId;
+    @ManyToOne
+    @JoinColumn(name = "placement_id", referencedColumnName = "id")
+    private Placement placement;
+
 
 }

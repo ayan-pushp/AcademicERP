@@ -19,13 +19,15 @@ public class PlacementFilter {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "placement_id")
+    @JoinColumn(name = "placement_id",nullable=false)
     private Placement placement;
 
-    @Column(name = "specialisation", nullable = false)
-    private String specialisation;
+    @ManyToOne
+    @JoinColumn(name = "domain", referencedColumnName = "domain_id", nullable = false)
+    private Domain domain;
 
-    @Column(name = "domain", nullable = false)
-    private String domain;
+    @ManyToOne
+    @JoinColumn(name = "specialisation", referencedColumnName = "specialisation_id", nullable = false)
+    private Specialisation specialisation;
 
 }

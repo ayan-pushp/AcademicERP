@@ -30,7 +30,7 @@ public record EmployeeRequest(
 
         @NotBlank(message = "Department should be present")
         @JsonProperty("department")
-        String department
+        Long department
         ) {
 
 }
