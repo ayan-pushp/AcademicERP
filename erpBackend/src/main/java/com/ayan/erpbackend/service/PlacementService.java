@@ -4,19 +4,19 @@ import com.ayan.erpbackend.dto.*;
 import com.ayan.erpbackend.entity.Department;
 import com.ayan.erpbackend.entity.Employee;
 import com.ayan.erpbackend.entity.Placement;
+import com.ayan.erpbackend.entity.Student;
 import com.ayan.erpbackend.helper.JWTHelper;
 import com.ayan.erpbackend.helper.EncryptionService;
-import com.ayan.erpbackend.repo.DepartmentRepository;
-import com.ayan.erpbackend.repo.EmployeeRepository;
+import com.ayan.erpbackend.repo.*;
 
-import com.ayan.erpbackend.repo.PlacementRepository;
-import com.ayan.erpbackend.repo.StudentRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -28,7 +28,7 @@ public class PlacementService {
     private final EmployeeRepository employeeRepo;
     private final StudentRepository studentRepo;
     private final DepartmentRepository departmentRepo;
-
+    private final PlacementStudentRepository placementStudentRepo;
     private final EncryptionService encryptionService;
     private final JWTHelper jwtHelper;
 
@@ -55,14 +55,14 @@ public class PlacementService {
         // Check if the employee exists
         Optional<Employee> employeeOptional = employeeRepo.findByEmail(request.email());
         if (employeeOptional.isEmpty()) {
-            throw new NoSuchElementException("Employee with email " + request.email() + " not found!");
+            return new ResponseEntity<>("Employee with email " + request.email() + " not found!", HttpStatus.NOT_FOUND);
         }
 
         employee = employeeOptional.get();  // Unwrap the Optional
 
         // Check if the password is correct
         if (!encryptionService.validates(request.password(), employee.getPassword())){
-            return new ResponseEntity<>("Wrong Password!", HttpStatus.BAD_REQUEST); // 400 Bad Request for wrong password
+            return new ResponseEntity<>("Wrong Password!", HttpStatus.BAD_REQUEST);
         }
 
         // Check if the department is Outreach
@@ -70,12 +70,28 @@ public class PlacementService {
             return new ResponseEntity<>("Department "+employee.getDepartment()+" unauthorized!", HttpStatus.UNAUTHORIZED);
         }
 
-        // If email, password and department are correct, generate the token
         String token = jwtHelper.generateToken(request.email());
-        return new ResponseEntity<>("Employee logged in successfully!\nHere's the token: " + token, HttpStatus.OK); // 200 OK for success
+
+        try {
+            String responseJson = new ObjectMapper().writeValueAsString(Map.of("token", token,"name",employee.getFirstName()));
+            return new ResponseEntity<>(responseJson, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error generating token", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public List<PlacementOfferResponse> getOrganisationOffers() {
+        System.out.println("Fetching placement offers...");
+        List<PlacementOfferResponse> offers = placementRepo.findOrganisationOffers();
+        if (offers.isEmpty()) {
+            throw new NoSuchElementException("No Offers at the moment!");
+        }
+        return offers;
+
     }
 
     public List<StudentResponse> getEligibleStudents(Long placementId){
+        System.out.println("Fetching eligible students...");
         // Check if the placement id exists
         Optional<Placement> placementOptional = placementRepo.findById(placementId);
         if (placementOptional.isEmpty()) {
@@ -85,6 +101,7 @@ public class PlacementService {
     }
 
     public List<StudentResponse> getAppliedStudents(Long placementId){
+        System.out.println("Fetching applied students...");
         // Check if the placement id exists
         Optional<Placement> placementOptional = placementRepo.findById(placementId);
         if (placementOptional.isEmpty()) {
@@ -93,8 +110,19 @@ public class PlacementService {
         return studentRepo.findAppliedStudents(placementId);
     }
 
-    public List<Object[]> getOrganisationOffersWithFilteredStudents(Long domain, Long specialisation, Float minGrade) {
-        return placementRepo.findOrganisationOffersWithFilteredStudents(domain, specialisation, minGrade);
+    public String acceptStudent(Long studentId,PlacementStudentOfferRequest request) {
+        System.out.println("Accepting student...");
+        Optional<Student> student = studentRepo.findById(studentId);
+        if (student.isEmpty()) {
+            throw new NoSuchElementException("Student Id " + studentId + " not found!");
+        }
+        Optional<Placement> placementOptional = placementRepo.findById(request.placementId());
+        if (placementOptional.isEmpty()) {
+            throw new NoSuchElementException("Placement Id " + request.placementId() + " not found!");
+        }
+         placementStudentRepo.acceptStudent(studentId,request.comment());
+         placementStudentRepo.setPlacementId(studentId,request.placementId());
+        return "Accepted "+request.studentName()+" for "+ request.companyName();
     }
 }
 

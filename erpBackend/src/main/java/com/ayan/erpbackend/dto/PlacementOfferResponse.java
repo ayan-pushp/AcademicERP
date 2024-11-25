@@ -3,8 +3,14 @@ package com.ayan.erpbackend.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public record PlacementOfferResponse(
-        @JsonProperty("organisation")
-        String organisation,
+        @JsonProperty("name")
+        String name,
+
+        @JsonProperty("address")
+        String address,
+
+        @JsonProperty("id")
+        Long id,
 
         @JsonProperty("profile")
         String profile,
@@ -12,16 +18,12 @@ public record PlacementOfferResponse(
         @JsonProperty("description")
         String description,
 
-        @JsonProperty("minimumGrade")
-        double minimumGrade,
-
         @JsonProperty("intake")
         int intake,
 
-        @JsonProperty("specialisation")
-        String specialisation,
+        @JsonProperty("minimum_grade")
+        double minimumGrade
 
-        @JsonProperty("domain")
-        String domain
 ) {
+
 }

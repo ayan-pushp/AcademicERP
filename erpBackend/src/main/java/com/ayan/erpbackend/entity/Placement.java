@@ -33,9 +33,11 @@ public class Placement {
     @Column(name = "intake", nullable = false)
     private int intake;
 
-    @Column(name = "minimumGrade", nullable = false)
+    @Column(name = "minimum_grade", nullable = false)
     private double minimumGrade;
 
-//    @OneToMany(mappedBy = "placement")
-//    private List<PlacementFilter> placementFilters;
+    @OneToMany(mappedBy = "placement")
+    private List<PlacementFilter> placementFilters;
+
+
 }

@@ -6,22 +6,21 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
 @Component
 public class JWTHelper {
-    private String SECRET_KEY = "cr666N7wIV+KJ2xOQpWtcfAekL4YXd9gbnJMs8SJ9sI=";
+    private final String SECRET_KEY = "cr666N7wIV+KJ2xOQpWtcfAekL4YXd9gbnJMs8SJ9sI=";
 
     // Extract username from the token
     public String extractUsername(String token) {
-
         return extractClaim(token, Claims::getSubject);
     }
 
     // Extract expiration date from the token
     public Date extractExpiration(String token) {
-
         return extractClaim(token, Claims::getExpiration);
     }
 
@@ -38,7 +37,6 @@ public class JWTHelper {
 
     // Check if token is expired
     public Boolean isTokenExpired(String token) {
-
         return extractExpiration(token).before(new Date());
     }
 
@@ -51,14 +49,20 @@ public class JWTHelper {
     // Create token with claims
     private String createToken(Map<String, Object> claims, String subject) {
         return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // Token valid for 1 hour
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 30)) // Token valid for 5 min
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY).compact();
     }
 
     // Validate token
     public Boolean validateToken(String token, String username) {
         final String extractedUsername = extractUsername(token);
-        return (extractedUsername.equals(username) && !isTokenExpired(token));
+
+        // Check if the username matches and the token is not expired
+        if (extractedUsername.equals(username) && !isTokenExpired(token)) {
+            return true;
+        }
+
+        // If token is expired or username doesn't match, throw an ExpiredJwtException
+        throw new ExpiredJwtException(null, null, "Token has expired or is invalid.");
     }
 }
-

@@ -3,6 +3,9 @@ package com.ayan.erpbackend.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public record StudentResponse(
+        @JsonProperty("id")
+        Long id,
+
         @JsonProperty("roll_number")
         String rollNumber,
 
@@ -16,6 +19,13 @@ public record StudentResponse(
         String email,
 
         @JsonProperty("cgpa")
-        double cgpa
+        double cgpa,
+
+        @JsonProperty("domain")
+        String domain,
+
+        @JsonProperty("specialisation")
+        String specialisation
+
 ) {
 }

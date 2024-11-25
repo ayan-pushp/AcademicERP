@@ -23,18 +23,18 @@ INSERT INTO employee (email, first_name, last_name, password, title, department_
 
 -- Insert data into Domain Table
 INSERT INTO domain (batch, capacity, program, qualification) VALUES
-                                                                 ('2022', 150, 'Computer Science', 'Bachelor'),
-                                                                 ('2023', 100, 'Computer Science', 'Master'),
+                                                                 ('2022', 150, 'CSE', 'Bachelor'),
+                                                                 ('2023', 100, 'CSE', 'Master'),
                                                                  ('2022', 150, 'Electronics & Communication', 'Bachelor'),
                                                                  ('2023', 60, 'Electronics & Communication', 'Master'),
                                                                  ('2024', 50, 'Data Science & Artificial Intelligence', 'Master');
 
 -- Insert data into Specialisation Table
 INSERT INTO specialisation (code, credits_required, description, name, year) VALUES
-                                                                                 ('DSA', 80, 'Specialisation in Advanced Algorithms', 'Data Structures & Algorithms', 3),
+                                                                                 ('DSA', 80, 'Specialisation in Advanced Algorithms', 'Advanced Algorithms', 3),
                                                                                  ('CYS', 60, 'Specialisation in CyberSecurity', 'Cyber Security', 2),
-                                                                                 ('AIML', 70, 'Specialisation in Artificial Intelligence', 'Artificial Intelligence', 2),
-                                                                                 ('VLSI', 60, 'Specialisation in VLSI', 'Very Large Scale Integration', 3),
+                                                                                 ('AIML', 70, 'Specialisation in Artificial Intelligence', 'AI', 2),
+                                                                                 ('VLSI', 60, 'Specialisation in Very Large Scale Integration', 'VLSI', 3),
                                                                                  ('SSP', 70, 'Specialisation in Signal Systems and Processing', 'Signal Systems', 3);
 
 -- Insert data into Organisations Table

@@ -11,21 +11,20 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @RequiredArgsConstructor
+public class SecurityConfig implements WebMvcConfigurer {
 
-public class SecurityConfig  implements WebMvcConfigurer {
     private final RequestInterceptor requestInterceptor;
+
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        // Apply the interceptor to all endpoints except /auth/login
         registry.addInterceptor(requestInterceptor)
-                .addPathPatterns("/**")
-                .excludePathPatterns("/api/v1/auth/**");
+                .addPathPatterns("/api/**")  // Apply to all API endpoints
+                .excludePathPatterns("/api/auth/**");  // Exclude authentication endpoints
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-
         return new BCryptPasswordEncoder();
     }
 }

@@ -51,5 +51,4 @@ public class Student {
     @JoinColumn(name = "placement_id", referencedColumnName = "id")
     private Placement placement;
 
-
 }

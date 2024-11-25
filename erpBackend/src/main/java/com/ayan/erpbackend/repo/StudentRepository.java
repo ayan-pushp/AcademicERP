@@ -8,10 +8,10 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface StudentRepository extends JpaRepository<Student, Integer> {
+public interface StudentRepository extends JpaRepository<Student, Long> {
 
     @Query("SELECT new com.ayan.erpbackend.dto.StudentResponse(" +
-            "s.rollNumber, s.firstName, s.lastName, s.email, s.cgpa) " +
+            "s.id, s.rollNumber, s.firstName, s.lastName, s.email, s.cgpa,s.domain.program,s.specialisation.name) " +
             "FROM Student s " +
             "WHERE s.domain in (SELECT pf.domain FROM PlacementFilter pf WHERE pf.placement.id=:placementId)"+
             "AND s.specialisation in (SELECT pf.specialisation FROM PlacementFilter pf WHERE pf.placement.id=:placementId)"+
@@ -20,10 +20,10 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
     List<StudentResponse> findEligibleStudents(@Param("placementId") Long placementId);
 
     @Query("SELECT new com.ayan.erpbackend.dto.StudentResponse(" +
-            "s.rollNumber, s.firstName, s.lastName, s.email, s.cgpa) " +
+            "s.id, s.rollNumber, s.firstName, s.lastName, s.email, s.cgpa,s.domain.program,s.specialisation.name) " +
             "FROM Student s " +
             "JOIN PlacementStudent ps ON s.id = ps.student.id " +
-            "WHERE ps.placement.id = :placementId")
+            "WHERE ps.placement.id = :placementId AND ps.acceptance is NULL")
     List<StudentResponse> findAppliedStudents(@Param("placementId") Long placementId);
 
 }
