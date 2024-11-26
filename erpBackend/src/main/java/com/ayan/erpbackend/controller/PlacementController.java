@@ -37,6 +37,10 @@ public class PlacementController {
     @PostMapping("/accept/{studentId}")
     public ResponseEntity<String> acceptStudent(@PathVariable Long studentId,@RequestBody @Valid PlacementStudentOfferRequest request) {
         return ResponseEntity.ok(placementService.acceptStudent(studentId,request));
+    }
 
+    @PostMapping("/reject/{studentId}")
+    public ResponseEntity<String> rejectStudent(@PathVariable Long studentId,@RequestBody @Valid PlacementStudentOfferRequest request) {
+        return ResponseEntity.ok(placementService.rejectStudent(studentId,request));
     }
 }

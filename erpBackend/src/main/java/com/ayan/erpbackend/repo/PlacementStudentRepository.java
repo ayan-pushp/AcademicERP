@@ -10,13 +10,18 @@ import org.springframework.transaction.annotation.Transactional;
 public interface PlacementStudentRepository extends JpaRepository<PlacementStudent, Integer> {
     @Modifying
     @Transactional
-    @Query("UPDATE PlacementStudent SET acceptance=true, comments=:comment, date=CURRENT_TIMESTAMP WHERE student.id=:studentId")
-   void acceptStudent(@Param("studentId") Long studentId, @Param("comment") String comment);
+    @Query("UPDATE PlacementStudent ps SET ps.acceptance=true, ps.comments=:comment, ps.date=CURRENT_TIMESTAMP WHERE ps.student.id=:studentId AND ps.placement.id=:placementId AND ps.student.cgpa >=(SELECT p.minimumGrade FROM Placement p WHERE p.id=ps.placement.id)")
+   int acceptStudent(@Param("studentId") Long studentId, @Param("placementId") Long placementId, @Param("comment") String comment);
 
     @Modifying
     @Transactional
     @Query("UPDATE Student s SET s.placement.id = :placementId WHERE s.id = :studentId")
-    void setPlacementId(@Param("studentId") Long studentId, @Param("placementId") Long placementId);
+    int setPlacementId(@Param("studentId") Long studentId, @Param("placementId") Long placementId);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE PlacementStudent ps SET ps.acceptance=false, ps.comments=:comment, ps.date=CURRENT_TIMESTAMP WHERE ps.student.id=:studentId AND ps.placement.id=:placementId ")
+    int rejectStudent(@Param("studentId") Long studentId, @Param("placementId") Long placementId, @Param("comment") String comment);
 
 }
 

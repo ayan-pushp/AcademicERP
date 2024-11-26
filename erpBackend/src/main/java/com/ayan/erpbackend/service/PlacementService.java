@@ -10,11 +10,14 @@ import com.ayan.erpbackend.helper.EncryptionService;
 import com.ayan.erpbackend.repo.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -110,7 +113,7 @@ public class PlacementService {
         return studentRepo.findAppliedStudents(placementId);
     }
 
-    public String acceptStudent(Long studentId,PlacementStudentOfferRequest request) {
+    public String acceptStudent(Long studentId,PlacementStudentOfferRequest request){
         System.out.println("Accepting student...");
         Optional<Student> student = studentRepo.findById(studentId);
         if (student.isEmpty()) {
@@ -120,9 +123,34 @@ public class PlacementService {
         if (placementOptional.isEmpty()) {
             throw new NoSuchElementException("Placement Id " + request.placementId() + " not found!");
         }
-         placementStudentRepo.acceptStudent(studentId,request.comment());
-         placementStudentRepo.setPlacementId(studentId,request.placementId());
-        return "Accepted "+request.studentName()+" for "+ request.companyName();
+         if(placementStudentRepo.acceptStudent(studentId,request.placementId(), request.comment())==0){
+                 return ("Failed: "+request.studentName()+" doesn't meet eligibility criteria for "+request.companyName()+"!");
+         }
+         if(placementStudentRepo.setPlacementId(studentId,request.placementId())==0){
+             try {
+                 throw new SQLException("Couldn't update Placement ID "+request.placementId()+" for "+request.studentName()+" with student id "+studentId);
+             } catch (SQLException e) {
+                 throw new RuntimeException(e);
+             }
+         }
+        return ("Success: "+request.studentName()+" has been accepted for "+ request.companyName()+"!");
+    }
+
+    public String rejectStudent(Long studentId,PlacementStudentOfferRequest request) {
+        System.out.println("Rejecting student...");
+        Optional<Student> student = studentRepo.findById(studentId);
+        if (student.isEmpty()) {
+            throw new NoSuchElementException("Student Id " + studentId + " not found!");
+        }
+        Optional<Placement> placementOptional = placementRepo.findById(request.placementId());
+        if (placementOptional.isEmpty()) {
+            throw new NoSuchElementException("Placement Id " + request.placementId() + " not found!");
+        }
+        if(placementStudentRepo.rejectStudent(studentId,request.placementId(), request.comment())==0){
+            return ("Failed: Couldn't update rejection status!");
+        }
+        return ("Success: "+request.studentName()+" has been rejected for "+ request.companyName()+"!");
+
     }
 }
 
