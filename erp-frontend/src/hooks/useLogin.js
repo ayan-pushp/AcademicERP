@@ -14,11 +14,13 @@ const useLogin = () => {
       const response = await login({ email, password });
 
       if (response.data.token) {
-        const newUser = new User(email, response.data.name, response.data.token); // Create a new user instance
-        setUser(newUser);  // Store the user in the state
+        const newUser = new User(response.data.pic, response.data.title, response.data.department, response.data.name, response.data.token); // Create a new user instance
+        setUser(newUser);
         localStorage.setItem("username", newUser.name);
         localStorage.setItem("authToken", newUser.token);
-        alert("Login successful");
+        localStorage.setItem("pic", newUser.pic);
+        setErrorMessage("");
+        //alert("Login successful");
         return true;
       }
     } catch (error) {
@@ -28,7 +30,7 @@ const useLogin = () => {
         setErrorMessage("Unexpected error occurred.");
       }
       console.error("Login failed:", error);
-      alert("Login failed");
+      //alert("Login failed");
       return false;
     }
   };

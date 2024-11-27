@@ -36,4 +36,7 @@ public class Employee {
 
     @Column(name = "password")
     private String password;
+
+    @Column(name = "photograph_path")
+    private String photographPath;
 }

@@ -25,7 +25,10 @@ public record StudentResponse(
         String domain,
 
         @JsonProperty("specialisation")
-        String specialisation
+        String specialisation,
+
+        @JsonProperty("cv_application")
+        String cvApplication
 
 ) {
 }

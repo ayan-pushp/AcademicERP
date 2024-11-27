@@ -1,6 +1,8 @@
 import React from "react";
 import "./PlacementPage.css";
 import { usePlacementPage } from "../hooks/usePlacementPage";
+import { FaFilePdf } from "react-icons/fa"; // Import PDF icon
+
 
 const PlacementPage = () => {
   const {
@@ -25,11 +27,23 @@ const PlacementPage = () => {
     setComment,
   } = usePlacementPage();
 
+
+  
+  const employeePhoto = localStorage.getItem("pic");
   return (
     <div>
       <nav className="navbar">
         <div className="navbar">
-          <span>Welcome {username}</span>
+          {employeePhoto ? (
+              <img
+                src={employeePhoto}
+                alt="Employee"
+                className="employee-photo"
+              />
+            ) : (
+              <span>Loading...</span>
+            )}
+          <span>Hello {username}!</span>
         </div>
         <div className="navbar">
           <h1>Placement Management Portal</h1>
@@ -192,6 +206,7 @@ const PlacementPage = () => {
                       <option value="4.0">4.0</option>
                     </select>
                   </th>
+                  <th>Resume</th>
                 </tr>
               </thead>
               <tbody>
@@ -210,6 +225,13 @@ const PlacementPage = () => {
                     <td>{student.domain}</td>
                     <td>{student.specialisation}</td>
                     <td>{student.cgpa}</td>
+                    <td>
+                      {student.cv_application && (
+                        <a href={student.cv_application} target="_blank" rel="noopener noreferrer">
+                          <FaFilePdf style={{ color: "red", fontSize: "1.5em" }} />
+                        </a>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>

@@ -18,15 +18,22 @@ const LoginPage = () => {
   // Redirect to the PlacementPage after successful login
   useEffect(() => {
     if (user) {
-      // Navigate to the placement page if user is successfully logged in
-      navigate("/dashboard");
+      // Delay navigation by a few seconds
+      const timer = setTimeout(() => {
+        navigate("/dashboard");
+      }, 1500); 
+  
+      // Cleanup the timer if the component unmounts or the dependencies change
+      return () => clearTimeout(timer);
     }
   }, [user, navigate]);
+  
 
   return (
-    <div className="login-container">
+    <div className="login-container" >
       <div className="login-box">
-        <h1>Employee Login</h1>
+        <h1 style={{color:"green"}}>ACADEMIC ERP</h1>
+        <h4>Placement Portal Login</h4>
         <form onSubmit={handleLogin}>
           <input
             type="email"
@@ -53,7 +60,7 @@ const LoginPage = () => {
         {user && (
           <div>
             <p>Welcome, {user.name}!</p>
-            <p>Email: {user.email}</p>
+            <p>Title: {user.title},{user.department}</p>
           </div>
         )}
       </div>

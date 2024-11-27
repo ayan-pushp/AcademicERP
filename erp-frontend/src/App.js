@@ -19,6 +19,8 @@ function App() {
 
           {/* Redirect to login page if no route matches */}
           <Route path="/" element={<LoginPage />} />
+
+          
         </Routes>
       </Router>
   );

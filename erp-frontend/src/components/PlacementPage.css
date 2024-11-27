@@ -261,3 +261,17 @@ body {
     bottom: 0;
     width: 100%;
   }
+
+  .employee-photo {
+  margin: 10px;           
+  border: 1px solid #ccc; 
+  width: 80px;                
+  height: 80px;              
+  border-radius: 20%;         
+  object-fit: center;       
+  transition: transform 0.3s; 
+}
+
+
+  
+  

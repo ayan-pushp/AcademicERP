@@ -18,7 +18,15 @@ public record PlacementStudentOfferRequest(
 
         @NotNull(message="Company Name is required")
         @JsonProperty("company")
-        String companyName
+        String companyName,
+
+        @NotNull(message="Domain is required")
+        @JsonProperty("domain")
+        String domain,
+
+        @NotNull(message="Specialisation Name is required")
+        @JsonProperty("specialisation")
+        String specialisation
 
 ) {
 }

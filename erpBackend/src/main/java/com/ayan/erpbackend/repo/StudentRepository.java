@@ -11,7 +11,7 @@ import java.util.List;
 public interface StudentRepository extends JpaRepository<Student, Long> {
 
     @Query("SELECT new com.ayan.erpbackend.dto.StudentResponse(" +
-            "s.id, s.rollNumber, s.firstName, s.lastName, s.email, s.cgpa,s.domain.program,s.specialisation.name) " +
+            "s.id, s.rollNumber, s.firstName, s.lastName, s.email, s.cgpa,s.domain.program,s.specialisation.name, s.firstName) " +
             "FROM Student s " +
             "WHERE s.domain in (SELECT pf.domain FROM PlacementFilter pf WHERE pf.placement.id=:placementId)"+
             "AND s.specialisation in (SELECT pf.specialisation FROM PlacementFilter pf WHERE pf.placement.id=:placementId)"+
@@ -20,7 +20,7 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     List<StudentResponse> findEligibleStudents(@Param("placementId") Long placementId);
 
     @Query("SELECT new com.ayan.erpbackend.dto.StudentResponse(" +
-            "s.id, s.rollNumber, s.firstName, s.lastName, s.email, s.cgpa,s.domain.program,s.specialisation.name) " +
+            "s.id, s.rollNumber, s.firstName, s.lastName, s.email, s.cgpa,s.domain.program,s.specialisation.name,ps.cvApplication) " +
             "FROM Student s " +
             "JOIN PlacementStudent ps ON s.id = ps.student.id " +
             "WHERE ps.placement.id = :placementId AND ps.acceptance is NULL")

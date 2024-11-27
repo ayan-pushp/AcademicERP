@@ -1,6 +1,8 @@
 class User {
-    constructor(email, name, token) {
-      this.email = email;
+    constructor(pic,title,department, name, token) {
+      this.pic=pic;
+      this.department = department;
+      this.title=title;
       this.name = name;
       this.token = token;
     }

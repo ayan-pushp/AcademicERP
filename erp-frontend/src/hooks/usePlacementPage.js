@@ -22,6 +22,7 @@ export const usePlacementPage = () => {
   const handleLogout = () => {
     localStorage.removeItem("authToken");
     localStorage.removeItem("username");
+    localStorage.removeItem("pic");
     navigate("/login");
   };
 
@@ -45,6 +46,8 @@ export const usePlacementPage = () => {
         if (error.response.status === 401) {
           alert("Session expired, please log in again.");
           localStorage.removeItem("authToken");
+          localStorage.removeItem("username");
+          localStorage.removeItem("pic");
           navigate("/login");
         } else {
           console.error("Error fetching offers:", error);
@@ -98,6 +101,8 @@ export const usePlacementPage = () => {
           student_name: `${selectedStudent.first_name} ${selectedStudent.last_name}`,
           company: name,
           comment,
+          domain: selectedStudent.domain,
+          specialisation: selectedStudent.specialisation
         }
       );
 
@@ -133,6 +138,8 @@ export const usePlacementPage = () => {
           student_name: `${selectedStudent.first_name} ${selectedStudent.last_name}`,
           comment,
           company: name,
+          domain: selectedStudent.domain,
+          specialisation: selectedStudent.specialisation
         }
       );
 
@@ -147,6 +154,9 @@ export const usePlacementPage = () => {
     } catch (error) {
       console.error("Error rejecting student:", error);
     }
+    resetFilters();
+    setComment("");
+    setSelectedStudent(null);
   };
 
   const closeModal = () => {

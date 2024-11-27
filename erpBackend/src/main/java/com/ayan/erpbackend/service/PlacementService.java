@@ -70,16 +70,16 @@ public class PlacementService {
 
         // Check if the department is Outreach
         if(!employee.getDepartment().getName().equals("Outreach")){
-            return new ResponseEntity<>("Department "+employee.getDepartment()+" unauthorized!", HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(employee.getDepartment().getName()+" department unauthorized!", HttpStatus.UNAUTHORIZED);
         }
 
         String token = jwtHelper.generateToken(request.email());
 
         try {
-            String responseJson = new ObjectMapper().writeValueAsString(Map.of("token", token,"name",employee.getFirstName()));
+            String responseJson = new ObjectMapper().writeValueAsString(Map.of("token", token,"name",employee.getFirstName(),"department",employee.getDepartment().getName(),"title",employee.getTitle(),"pic",employee.getPhotographPath() != null ? employee.getPhotographPath() : ""));
             return new ResponseEntity<>(responseJson, HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>("Error generating token", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("Error generating response", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
