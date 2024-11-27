@@ -1,25 +1,27 @@
-//src/App.js
+// src/App.js
+
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import LoginPage from "./component/LoginPage";
-import PlacementPage from "./component/PlacementPage";
-
+import LoginPage from "./components/LoginPage";
+import PlacementPage from "./components/PlacementPage";
+import "./App.css";
 
 function App() {
-  
   return (
     
-    <Router>
-      <Routes>
-        {/* Ensure the root route ("/") has a valid component */}
-        <Route path="/" element={<LoginPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/dashboard" element={<PlacementPage />} />
+      <Router>
+        <Routes>
+          {/* Define the route for the login page */}
+          <Route path="/login" element={<LoginPage />} />
+          
+          {/* Define the route for the placement page */}
+          <Route path="/dashboard" element={<PlacementPage />} />
 
-      </Routes>
-    </Router>
+          {/* Redirect to login page if no route matches */}
+          <Route path="/" element={<LoginPage />} />
+        </Routes>
+      </Router>
   );
-  
 }
 
 export default App;
