@@ -5,14 +5,15 @@ import com.ayan.erpbackend.entity.Department;
 import com.ayan.erpbackend.entity.Employee;
 import com.ayan.erpbackend.entity.Placement;
 import com.ayan.erpbackend.entity.Student;
+import com.ayan.erpbackend.exception.EmployeeNotFoundException;
+import com.ayan.erpbackend.exception.OfferNotFoundException;
+import com.ayan.erpbackend.exception.StudentNotFoundException;
 import com.ayan.erpbackend.helper.JWTHelper;
 import com.ayan.erpbackend.helper.EncryptionService;
 import com.ayan.erpbackend.repo.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,8 +36,22 @@ public class PlacementService {
     private final EncryptionService encryptionService;
     private final JWTHelper jwtHelper;
 
+    private void checkStudentExists(Long studentId) {
+        Optional<Student> student = studentRepo.findById(studentId);
+        if (student.isEmpty()) {
+            throw new StudentNotFoundException("Student Id " + studentId + " doesn't exist!");
+        }
+    }
+
+    private void checkOfferExists(Long placementId) {
+
+        Optional<Placement> placementOptional = placementRepo.findById(placementId);
+        if (placementOptional.isEmpty()) {
+            throw new OfferNotFoundException("Placement Id " + placementId + " doesn't exist!");
+        }
+    }
+
     public String createEmployee(EmployeeRequest request) {
-        // Retrieve the department entity based on the department ID
         Department department = departmentRepo.findById(request.department())
                 .orElseThrow(() -> new NoSuchElementException("Department with ID " + request.department() + " not found"));
 
@@ -53,33 +68,29 @@ public class PlacementService {
     }
 
     public ResponseEntity<String> login(LoginRequest request) {
-        Employee employee;
 
-        // Check if the employee exists
         Optional<Employee> employeeOptional = employeeRepo.findByEmail(request.email());
         if (employeeOptional.isEmpty()) {
-            return new ResponseEntity<>("Employee with email " + request.email() + " not found!", HttpStatus.NOT_FOUND);
+            throw new EmployeeNotFoundException("Employee with email " + request.email() + " doesn't exist!");
         }
+        Employee employee = employeeOptional.get();
 
-        employee = employeeOptional.get();  // Unwrap the Optional
-
-        // Check if the password is correct
+        // Checking password
         if (!encryptionService.validates(request.password(), employee.getPassword())){
             return new ResponseEntity<>("Wrong Password!", HttpStatus.BAD_REQUEST);
         }
-
-        // Check if the department is Outreach
+        // Checking if department is Outreach
         if(!employee.getDepartment().getName().equals("Outreach")){
             return new ResponseEntity<>(employee.getDepartment().getName()+" department unauthorized!", HttpStatus.UNAUTHORIZED);
         }
-
-        String token = jwtHelper.generateToken(request.email());
-
+        //Generate Token
         try {
+            String token = jwtHelper.generateToken(request.email());
             String responseJson = new ObjectMapper().writeValueAsString(Map.of("token", token,"name",employee.getFirstName(),"department",employee.getDepartment().getName(),"title",employee.getTitle(),"pic",employee.getPhotographPath() != null ? employee.getPhotographPath() : ""));
             return new ResponseEntity<>(responseJson, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>("Error generating response", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        catch (Exception e) {
+            return new ResponseEntity<>("Error generating token", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -90,40 +101,25 @@ public class PlacementService {
             throw new NoSuchElementException("No Offers at the moment!");
         }
         return offers;
-
     }
 
     public List<StudentResponse> getEligibleStudents(Long placementId){
         System.out.println("Fetching eligible students...");
-        // Check if the placement id exists
-        Optional<Placement> placementOptional = placementRepo.findById(placementId);
-        if (placementOptional.isEmpty()) {
-            throw new NoSuchElementException("Placement Id " + placementId + " not found!");
-        }
+        checkOfferExists( placementId);
         return studentRepo.findEligibleStudents(placementId);
     }
 
     public List<StudentResponse> getAppliedStudents(Long placementId){
         System.out.println("Fetching applied students...");
-        // Check if the placement id exists
-        Optional<Placement> placementOptional = placementRepo.findById(placementId);
-        if (placementOptional.isEmpty()) {
-            throw new NoSuchElementException("Placement Id " + placementId + " not found!");
-        }
+        checkOfferExists( placementId);
         return studentRepo.findAppliedStudents(placementId);
     }
 
     public String acceptStudent(Long studentId,PlacementStudentOfferRequest request){
         System.out.println("Accepting student...");
-        Optional<Student> student = studentRepo.findById(studentId);
-        if (student.isEmpty()) {
-            throw new NoSuchElementException("Student Id " + studentId + " not found!");
-        }
-        Optional<Placement> placementOptional = placementRepo.findById(request.placementId());
-        if (placementOptional.isEmpty()) {
-            throw new NoSuchElementException("Placement Id " + request.placementId() + " not found!");
-        }
-         if(placementStudentRepo.acceptStudent(studentId,request.placementId(), request.comment())==0){
+        checkStudentExists(studentId);
+        checkOfferExists( request.placementId());
+        if(placementStudentRepo.acceptStudent(studentId,request.placementId(), request.comment())==0){
                  return ("Failed: "+request.studentName()+" doesn't meet eligibility criteria for "+request.companyName()+"!");
          }
          if(placementStudentRepo.setPlacementId(studentId,request.placementId())==0){
@@ -138,19 +134,15 @@ public class PlacementService {
 
     public String rejectStudent(Long studentId,PlacementStudentOfferRequest request) {
         System.out.println("Rejecting student...");
-        Optional<Student> student = studentRepo.findById(studentId);
-        if (student.isEmpty()) {
-            throw new NoSuchElementException("Student Id " + studentId + " not found!");
-        }
-        Optional<Placement> placementOptional = placementRepo.findById(request.placementId());
-        if (placementOptional.isEmpty()) {
-            throw new NoSuchElementException("Placement Id " + request.placementId() + " not found!");
-        }
+        checkStudentExists(studentId);
+        checkOfferExists( request.placementId());
         if(placementStudentRepo.rejectStudent(studentId,request.placementId(), request.comment())==0){
             return ("Failed: Couldn't update rejection status!");
         }
         return ("Success: "+request.studentName()+" has been rejected for "+ request.companyName()+"!");
 
     }
+
+
 }
 

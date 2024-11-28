@@ -25,6 +25,24 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>("Not found: " + ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
+    // Exception handler for EmployeeNotFoundException
+    @ExceptionHandler(EmployeeNotFoundException.class)
+    public ResponseEntity<Object> handleEmployeeNotFoundException(EmployeeNotFoundException ex) {
+        return new ResponseEntity<>( ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    // Exception handler for StudentNotFoundException
+    @ExceptionHandler(StudentNotFoundException.class)
+    public ResponseEntity<Object> handleStudentNotFoundException(StudentNotFoundException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    // Exception handler for OfferNotFoundException
+    @ExceptionHandler(OfferNotFoundException.class)
+    public ResponseEntity<Object> handleOfferNotFoundException(OfferNotFoundException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
     // Handle Expired JWT Token
     @ExceptionHandler(ExpiredJwtException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
