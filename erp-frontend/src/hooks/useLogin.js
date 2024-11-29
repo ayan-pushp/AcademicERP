@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { login } from "../utils/api";  // Import the API function
-import User from "../model/User";  // Import the User model
+import { login } from "../utils/api";
+import User from "../model/User"; 
 
 const useLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const [user, setUser] = useState(null);  // Track the user object
+  const [user, setUser] = useState(null); 
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -20,17 +20,14 @@ const useLogin = () => {
         localStorage.setItem("authToken", newUser.token);
         localStorage.setItem("pic", newUser.pic);
         setErrorMessage("");
-        //alert("Login successful");
         return true;
       }
-    } catch (error) {
+    } 
+    catch (error) {
       if (error.response) {
-        setErrorMessage(error.response.data || "An error occurred.");
-      } else {
-        setErrorMessage("Unexpected error occurred.");
-      }
+        setErrorMessage(error.response.data);
+      } 
       console.error("Login failed:", error);
-      //alert("Login failed");
       return false;
     }
   };
@@ -39,7 +36,7 @@ const useLogin = () => {
     email,
     password,
     errorMessage,
-    user,  // Expose the user object
+    user,
     setEmail,
     setPassword,
     handleLogin,

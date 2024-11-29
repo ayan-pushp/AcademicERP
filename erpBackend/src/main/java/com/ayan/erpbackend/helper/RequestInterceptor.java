@@ -1,5 +1,6 @@
 package com.ayan.erpbackend.helper;
 
+import com.ayan.erpbackend.exception.JWTAuthenticationException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -9,40 +10,35 @@ import io.jsonwebtoken.ExpiredJwtException;
 
 @Component
 @RequiredArgsConstructor
-public class RequestInterceptor implements HandlerInterceptor {
-    private final JWTHelper jwtUtil;
+    public class RequestInterceptor implements HandlerInterceptor {
 
-    @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        String authorizationHeader = request.getHeader("Authorization");
+        private final JWTHelper jwtUtil;
 
-        // Check if the authorization header is present and starts with "Bearer "
-        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return false;
-        }
+        @Override
+        public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+            String authorizationHeader = request.getHeader("Authorization");
 
-        String token = authorizationHeader.substring(7); // Extract token from "Bearer {token}"
-
-        try {
-            String username = jwtUtil.extractUsername(token);
-
-            if (username == null || !jwtUtil.validateToken(token, username)) {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                return false;
+            // Check if the authorization header is present and starts with "Bearer "
+            if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+                throw new JWTAuthenticationException("Authorization header missing or malformed.");
             }
 
-        } catch (ExpiredJwtException e) {
-            System.out.println("Token expired: " + e.getMessage());
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return false;
-        } catch (Exception e) {
-            // Any other error
-            System.out.println("Token validation failed: " + e.getMessage());
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return false;
-        }
+            String token = authorizationHeader.substring(7); // Extract token from "Bearer {token}"
 
-        return true;
+            try {
+                String username = jwtUtil.extractUsername(token);
+
+                if (username == null || !jwtUtil.validateToken(token, username)) {
+                    throw new JWTAuthenticationException("Invalid JWT token.");
+                }
+
+            } catch (ExpiredJwtException e) {
+                throw new JWTAuthenticationException("Token expired: " + e.getMessage());
+            } catch (Exception e) {
+                throw new JWTAuthenticationException("Token validation failed: " + e.getMessage());
+            }
+
+            return true;
+        }
     }
-}
+

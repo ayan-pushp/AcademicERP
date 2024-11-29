@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";  // Import useNavigate
-import useLogin from "../hooks/useLogin";  // Import the custom hook
+import { useNavigate } from "react-router-dom"; 
+import useLogin from "../hooks/useLogin"; 
 import "./LoginPage.css";
 
 const LoginPage = () => {
-  const navigate = useNavigate();  // Initialize useNavigate hook
+  const navigate = useNavigate();
   const {
     email,
     password,
@@ -13,7 +13,7 @@ const LoginPage = () => {
     setEmail,
     setPassword,
     handleLogin,
-  } = useLogin();  // Use the custom hook
+  } = useLogin();
 
   // Redirect to the PlacementPage after successful login
   useEffect(() => {
@@ -55,8 +55,7 @@ const LoginPage = () => {
         </form>
 
         {errorMessage && <p className="error-message">{errorMessage}</p>}
-
-        {/* Display user info after successful login */}
+        
         {user && (
           <div>
             <p>Welcome, {user.name}!</p>

@@ -57,7 +57,11 @@ src
 │   │   │   │   ├── Specialisation.java
 │   │   │   │   ├── Student.java
 │   │   │   ├── exception
+│   │   │   │   ├── EmployeeNotFoundException.java
 │   │   │   │   ├── GlobalExceptionHandler.java
+│   │   │   │   ├── JWTAuthenticationException.java
+│   │   │   │   ├── OfferNotFoundException.java
+│   │   │   │   ├── StudentNotFoundException.java
 │   │   │   ├── helper
 │   │   │   │   ├── EncryptionService.java
 │   │   │   │   ├── JWTHelper.java
@@ -72,30 +76,19 @@ src
 │   │   │   │   ├── PlacementService.java
 │   │   │   ├── ErpBackendApplication.java
 ├── resources
-│   ├── scripts
-│   │   ├── alter_erp.sql
-│   │   ├── create_erp.sql
-│   │   ├── insert_erp.sql
-│   ├── static
-│   ├── templates
 │   ├── application.properties
+├── test
 ```
 
 #### **Backend Highlights**
 - **Security**: Configured using Spring Security with JWT authentication.
 - **Controllers**:
   - **AuthenticationController**: Handles user authentication and login requests.
-  - **PlacementController**: Handles placements, student data, and offers related requests.
+  - **PlacementController**: Handles placements, student data, and offers-related requests.
 - **Repositories**: Interfaces to access data from the database.
 - **Services**:
   - `PlacementService`: Contains business logic for handling placements and offers.
-- **Exception Handling**: Global exception handling with `GlobalExceptionHandler`.
-
-#### **Database Setup**
-SQL scripts in the `resources/scripts` folder:
-1. `create_erp.sql`: Creates the database schema.
-2. `alter_erp.sql`: Alters existing tables for enhancements.
-3. `insert_erp.sql`: Contains sample data for testing.
+- **Exception Handling**: Comprehensive handling using classes like `GlobalExceptionHandler` and custom exceptions.
 
 ---
 
@@ -105,16 +98,22 @@ SQL scripts in the `resources/scripts` folder:
 ```
 src
 ├── components
+│   ├── Filters.jsx
 │   ├── LoginPage.css
 │   ├── LoginPage.jsx
+│   ├── Modal.jsx
+│   ├── Navbar.jsx
+│   ├── OfferCard.jsx
 │   ├── PlacementPage.css
 │   ├── PlacementPage.jsx
+│   ├── StudentTable.jsx
 ├── hooks
 │   ├── useLogin.js
 │   ├── usePlacementPage.js
 ├── model
 │   ├── User.js
 ├── utils
+│   ├── api.js
 ├── App.css
 ├── App.js
 ├── App.test.js
@@ -126,20 +125,17 @@ src
 ```
 
 #### **Frontend Highlights**
-- **Component-Based Architecture**:
-  - `LoginPage.jsx`: Handles user login functionality.
-  - `PlacementPage.jsx`: Displays placement data with options to manage offers and view student details.
+- **Components**:
+  - `LoginPage.jsx`: Handles user authentication and secure login.
+  - `PlacementPage.jsx`: Displays placement data and offers, with options to manage students and filter data.
+  - `StudentTable.jsx`: Displays a list of students and their details.
 - **Custom Hooks**:
-  - `useLogin.js`: Handles login-related state and API calls.
-  - `usePlacementPage.js`: Manages placement-related logic and API interactions.
-- **Styling**:
-  - `LoginPage.css`: Contains styles for the login page.
-  - `PlacementPage.css`: Styles for placement-related views.
-
-#### **Assets**
-Located in the `public/resources` folder:
-- `cv.pdf`: Sample resume file.
-- `pic.jpg`: Sample employee photo.
+  - `useLogin.js`: Manages login-related API calls and states.
+  - `usePlacementPage.js`: Handles placement-related business logic.
+- **Styling**: 
+  - Individual styles for pages like `LoginPage.css` and `PlacementPage.css`.
+- **Utility Functions**:
+  - `api.js`: Centralized API calls for the frontend.
 
 ---
 
@@ -152,8 +148,7 @@ Located in the `public/resources` folder:
    cd Academic-ERP/erpBackend
    ```
 2. Configure the database in `application.properties`.
-3. Run the SQL scripts in the `resources/scripts` folder to set up the database.
-4. Build and run the application:
+3. Build and run the application:
    ```bash
    mvn clean install
    mvn spring-boot:run
@@ -182,10 +177,10 @@ Located in the `public/resources` folder:
    - Manage placement offers.
    - View eligible and applied student details.
    - Accept or reject a student for an offer.
-3. **Database Integration**:
-   - Pre-populated data for testing.
-4. **Modular Codebase**:
-   - Separation of concerns with DTOs, controllers, and services.
+3. **Student Filters**:
+   - Filter by academic grade, specialization, or domain.
+4. **Database Integration**:
+   - Fully connected with pre-populated test data.
 
 ---
 
@@ -197,20 +192,18 @@ Located in the `public/resources` folder:
   - React.js, React Hooks
   - CSS Modules
 - **Other Tools**:
-  - Maven
-  - npm
+  - Maven, npm
 
 ---
 
 ## **Contributions**
-Contributions are welcome! Please follow these steps:
+Contributions are welcome! Follow these steps:
 1. Fork the repository.
-2. Create a new feature branch:
+2. Create a feature branch:
    ```bash
    git checkout -b feature/your-feature-name
    ```
 3. Commit and push your changes.
 4. Submit a pull request.
 
----
----
+--- 

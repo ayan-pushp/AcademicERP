@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "../utils/api";
+import { setUpApiInterceptor } from "../utils/api";
 
 export const usePlacementPage = () => {
   const [offers, setOffers] = useState([]);
@@ -19,40 +20,16 @@ export const usePlacementPage = () => {
   const navigate = useNavigate();
   const username = localStorage.getItem("username");
 
-  const handleLogout = () => {
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("username");
-    localStorage.removeItem("pic");
-    navigate("/login");
-  };
-
   useEffect(() => {
+    setUpApiInterceptor(navigate);
+    const token = localStorage.getItem("authToken");
     const fetchOffers = async () => {
-      try {
-        const token = localStorage.getItem("authToken");
-        if (!token) {
-          console.log("No token found, redirect to login");
-          navigate("/login");
-          return;
-        }
-
         const response = await axios.get("/placement/allOffers", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-        setOffers(response.data);
-      } catch (error) {
-        if (error.response.status === 401) {
-          alert("Session expired, please log in again.");
-          localStorage.removeItem("authToken");
-          localStorage.removeItem("username");
-          localStorage.removeItem("pic");
-          navigate("/login");
-        } else {
-          console.error("Error fetching offers:", error);
-        }
-      }
+        setOffers(response.data); 
     };
     fetchOffers();
   }, [navigate]);
@@ -60,23 +37,20 @@ export const usePlacementPage = () => {
   const handleOfferSelect = async (offerId, name) => {
     resetFilters();
     try {
-      const eligibleResponse = await axios.get(
-        `http://localhost:8080/api/placement/eligibleFor/${offerId}`
-      );
+      const eligibleResponse = await axios.get(`/placement/eligibleFor/${offerId}`);
       setEligibleStudents(eligibleResponse.data);
-    } catch (error) {
+    } 
+    catch (error) {
       console.error("Error fetching eligible students:", error);
     }
 
     try {
-      const appliedResponse = await axios.get(
-        `http://localhost:8080/api/placement/appliedTo/${offerId}`
-      );
+      const appliedResponse = await axios.get(`/placement/appliedTo/${offerId}`);
       setAppliedStudents(appliedResponse.data);
-    } catch (error) {
+    } 
+    catch (error) {
       console.error("Error fetching applied students:", error);
     }
-
     setSelectedOffer({ offerId, name });
     setShowModal(true);
   };
@@ -90,12 +64,9 @@ export const usePlacementPage = () => {
       alert("Please select a student and add a comment");
       return;
     }
-
     const { offerId, name } = selectedOffer;
-
     try {
-      const response = await axios.post(
-        `http://localhost:8080/api/placement/accept/${selectedStudent.id}`,
+      const response = await axios.post(`/placement/accept/${selectedStudent.id}`,
         {
           placement_id: offerId,
           student_name: `${selectedStudent.first_name} ${selectedStudent.last_name}`,
@@ -105,16 +76,11 @@ export const usePlacementPage = () => {
           specialisation: selectedStudent.specialisation
         }
       );
-
-      const appliedResponse = await axios.get(
-        `http://localhost:8080/api/placement/appliedTo/${offerId}`
-      );
+      const appliedResponse = await axios.get(`/placement/appliedTo/${offerId}`);
       setAppliedStudents(appliedResponse.data);
-
       alert(response.data);
-      setSelectedStudent(null);
-      setComment("");
-    } catch (error) {
+    }
+     catch (error) {
       console.error("Error updating acceptance:", error);
     }
     resetFilters();
@@ -127,12 +93,9 @@ export const usePlacementPage = () => {
       alert("Please select a student and add a comment");
       return;
     }
-
     const { offerId, name } = selectedOffer;
-
     try {
-      const response = await axios.post(
-        `http://localhost:8080/api/placement/reject/${selectedStudent.id}`,
+      const response = await axios.post(`/placement/reject/${selectedStudent.id}`,
         {
           placement_id: offerId,
           student_name: `${selectedStudent.first_name} ${selectedStudent.last_name}`,
@@ -142,16 +105,11 @@ export const usePlacementPage = () => {
           specialisation: selectedStudent.specialisation
         }
       );
-
-      const appliedResponse = await axios.get(
-        `http://localhost:8080/api/placement/appliedTo/${offerId}`
-      );
+      const appliedResponse = await axios.get(`/placement/appliedTo/${offerId}`);
       setAppliedStudents(appliedResponse.data);
-
       alert(response.data);
-      setSelectedStudent(null);
-      setComment("");
-    } catch (error) {
+    } 
+    catch (error) {
       console.error("Error rejecting student:", error);
     }
     resetFilters();
@@ -202,6 +160,15 @@ export const usePlacementPage = () => {
 
       return meetsGrade && meetsDomain && meetsSpecialization;
     });
+
+    const handleLogout = () => {
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("username");
+      localStorage.removeItem("pic");
+      // Redirect to login page
+      navigate("/login");
+    };
+    
 
   return {
     username,
