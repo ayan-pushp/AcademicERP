@@ -41,17 +41,20 @@ const Modal = ({
           handleFilterChange={handleFilterChange}
           filterStudents={filterStudents}
           handleStudentSelect={handleStudentSelect}
-          appliedStudents={appliedStudents}
+          appliedStudents={[]}
+          isAppliedStudentsTable={false}
         />
 
         <StudentTable
           title="Applied Students"
           students={appliedStudents}
+          selectedStudent={selectedStudent}
           filters={filters}
           handleFilterChange={handleFilterChange}
           filterStudents={filterStudents}
           handleStudentSelect={handleStudentSelect}
           appliedStudents={appliedStudents}
+          isAppliedStudentsTable={true}
         />
 
         {selectedStudent && (

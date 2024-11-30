@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "../utils/api";
 import { setUpApiInterceptor } from "../utils/api";
+import {jwtDecode} from "jwt-decode";
 
 export const usePlacementPage = () => {
   const [offers, setOffers] = useState([]);
@@ -22,16 +23,46 @@ export const usePlacementPage = () => {
 
   useEffect(() => {
     setUpApiInterceptor(navigate);
+
     const token = localStorage.getItem("authToken");
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    try {
+      const { exp } = jwtDecode(token); // Decode token to get expiration time
+      const timeLeft = exp * 1000 - Date.now(); // Calculate time left in milliseconds
+
+      if (timeLeft <= 0) {
+        handleLogout();
+        return; // If token is already expired, log out immediately
+      } else {
+        // Set timeout for auto-logout
+        setTimeout(handleLogout, timeLeft);
+
+      }
+    } catch (error) {
+      console.error("Error decoding token:", error);
+      handleLogout(); // Log out if token decoding fails
+    }
+
     const fetchOffers = async () => {
+      try {
         const response = await axios.get("/placement/allOffers", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-        setOffers(response.data); 
+        setOffers(response.data);
+      } catch (error) {
+        console.error("Error fetching offers:", error);
+      }
     };
     fetchOffers();
+    
+        // Clean up timeout when component unmounts or dependencies change
+        return () => clearTimeout();
   }, [navigate]);
 
   const handleOfferSelect = async (offerId, name) => {
@@ -166,6 +197,7 @@ export const usePlacementPage = () => {
       localStorage.removeItem("username");
       localStorage.removeItem("pic");
       // Redirect to login page
+      alert("You have been logged out! Please login again.");
       navigate("/login");
     };
     

@@ -10,6 +10,7 @@ const StudentTable = ({
   filterStudents,
   handleStudentSelect,
   appliedStudents,
+  isAppliedStudentsTable = false,
 }) => {
   const isStudentApplied = (student) => {
     // Check if the student is in the appliedStudents list
@@ -64,24 +65,27 @@ const StudentTable = ({
                 <option value="4.0">4.0</option>
               </select>
             </th>
-            {students.length > 0 && isStudentApplied(students[0]) && <th>Resume</th>} {/* Only show Resume if any student in the list is applied */}
+            {isAppliedStudentsTable &&students.length > 0 && isStudentApplied(students[0]) && 
+            <th>Resume</th>} {/* Only show Resume if any student in the list is applied */}
           </tr>
         </thead>
         <tbody>
           {filterStudents(students).map((student) => {
             const isApplied = isStudentApplied(student);
+            const isSelected = selectedStudent && student.id === selectedStudent.id;
             return (
               <tr
                 key={student.id}
                 onClick={() => isApplied && handleStudentSelect(student)} // Only allow selection if student is applied
-                className={`student-row ${student === selectedStudent ? "selected" : ""}`}
+                className={`student-row ${isSelected ? "selected" : ""}`}
+                
               >
                 <td>{student.roll_number}</td>
                 <td>{student.first_name} {student.last_name}</td>
                 <td>{student.domain}</td>
                 <td>{student.specialisation}</td>
                 <td>{student.cgpa}</td>
-                {isApplied && student.cv_application && ( // Only show resume for applied students
+                {isApplied && student.cv_application && isAppliedStudentsTable && ( // Only show resume for applied students
                   <td>
                     <a href={student.cv_application} target="_blank" rel="noopener noreferrer">
                       <FaFilePdf style={{ color: "red", fontSize: "1.5em" }} />
